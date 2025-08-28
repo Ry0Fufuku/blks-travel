@@ -2,6 +2,7 @@ package com.example.blkstravel.service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.blkstravel.entity.House;
 import com.example.blkstravel.entity.Reservation;
 import com.example.blkstravel.entity.User;
-import com.example.blkstravel.form.ReservationRegisterForm;
 import com.example.blkstravel.repository.HouseRepository;
 import com.example.blkstravel.repository.ReservationRepository;
 import com.example.blkstravel.repository.UserRepository;
@@ -27,18 +27,26 @@ public class ReservationService {
 		this.userRepository = userRepository;
 	}
 	@Transactional
-	public void create(ReservationRegisterForm reservationRegisterForm) {
+	public void create(Map<String, String> paymentIntentObject) {
 		Reservation reservation = new Reservation();
-		House house = houseRepository.getReferenceById(reservationRegisterForm.getHouseId());
-		User user = userRepository.getReferenceById(reservationRegisterForm.getUserId());
-		LocalDate checkinDate = LocalDate.parse(reservationRegisterForm.getCheckinDate());
-		LocalDate checkoutDate = LocalDate.parse(reservationRegisterForm.getCheckoutDate());
+		Integer houseId = Integer.valueOf(paymentIntentObject.get("houseId"));
+		Integer userId = Integer.valueOf(paymentIntentObject.get("userId"));
+
+		House house = houseRepository.getReferenceById(houseId);
+		User user = userRepository.getReferenceById(userId);
+
+
+		LocalDate checkinDate = LocalDate.parse(paymentIntentObject.get("checkinDate"));
+		LocalDate checkoutDate = LocalDate.parse(paymentIntentObject.get("checkoutDate"));
+		Integer numberOfPeople = Integer.valueOf(paymentIntentObject.get("numberOfPeople"));
+		Integer amount = Integer.valueOf(paymentIntentObject.get("amount"));
 		reservation.setHouse(house);
 		reservation.setUser(user);
 		reservation.setCheckinDate(checkinDate);
 		reservation.setCheckoutDate(checkoutDate);
-		reservation.setNumberOfPeople(reservationRegisterForm.getNumberOfPeople());
-		reservation.setAmount(reservationRegisterForm.getAmount());
+		reservation.setNumberOfPeople(numberOfPeople);
+		reservation.setAmount(amount);
+
 		reservationRepository.save(reservation);
 	}
 
